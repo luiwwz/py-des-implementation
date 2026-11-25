@@ -2,10 +2,11 @@ from tables import IP, FP, E, P, PC1, PC2, SHIFTS, S_BOXES
 
 def text_to_bits(text: str):
     raw_bytes = text.encode('ascii') # 'A' -> 65
-    if len(raw_bytes) != 8:
-        raise ValueError("text must be 64 bits")
-
     return ''.join(format(byte, '08b') for byte in raw_bytes) # '65' -> 01000001
+
+def bits_to_text(bits:str):
+    chars = [chr(int(bits[i:i + 8], 2)) for i in range(0, 64, 8)]
+    return ''.join(chars)
 
 def permute(block: str, table: list[int]):
     return ''.join(block[i - 1] for i in table)
@@ -59,6 +60,22 @@ def encrypt_block(plaintext: str, key: str):
     key_64 = text_to_bits(key)
 
     round_keys = get_round_keys(key_64)
+
+    permuted = permute(block_64, IP)
+    left, right = permuted[:32], permuted[32:]
+
+    for i in range(16):
+        new_right = xor(left, feistel(right, round_keys[i]))
+        left, right = right, new_right
+
+    combined = right + left
+    return permute(combined, FP)
+
+def decrypt_block(block_64: str, key: str):
+    key_64 = text_to_bits(key)
+
+    round_keys = get_round_keys(key_64)
+    round_keys = round_keys[::-1]
 
     permuted = permute(block_64, IP)
     left, right = permuted[:32], permuted[32:]
