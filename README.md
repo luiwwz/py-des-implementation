@@ -11,8 +11,3 @@ An educational implementation of the symmetric-key block cipher **DES (Data Encr
 * `tables.py` — permutation tables (IP, FP, E, P, PC-1, PC-2), key shift schedule, and S-boxes.
 * `des.py` — bit conversion utilities, key generation, and encryption logic.
 * `main.py` — entry point for running the encryption.
-
-## Usage
-```bash
-python main.py
-```
